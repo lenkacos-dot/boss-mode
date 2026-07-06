@@ -201,7 +201,7 @@ MIT — 自由使用、修改、分发。
 ---
 
 <p align="center">
-  <strong>👔 Boss Mode v1.1.0</strong><br/>
+  <strong>👔 Boss Mode v1.1.2</strong><br/>
   <sub>Made by <a href="https://github.com/lenkacos-dot">@lenkacos-dot</a></sub>
 </p>
 
@@ -225,7 +225,7 @@ MIT — 自由使用、修改、分发。
 git clone https://github.com/lenkacos-dot/boss-mode ~/.hermes/skills/boss-mode
 ```
 
-Then tell your AI: **"Start Boss Mode calibration"** → answer 6 questions → done.
+Then tell your AI: **"Start Boss Mode calibration"** → answer 8 questions → done.
 
 **Zero dependencies** — pure Python stdlib, no pip install.
 
@@ -243,7 +243,7 @@ Then tell your AI: **"Start Boss Mode calibration"** → answer 6 questions → 
 
 ## 🏗 Architecture (3-layer)
 
-1. **Calibration (once):** Answer 6 scenario questions → AI computes 6 parameters + 1 style label.
+1. **Calibration (once):** Answer 8 scenario questions → AI computes 8 parameters + 1 style label.
 2. **Prompt Injection (every session):** AI reads your profile → generates a customized system prompt.
 3. **Feedback Loop (continuous):** You correct → AI logs → parameters ±0.05 → next time it's right.
 
@@ -257,9 +257,9 @@ Then tell your AI: **"Start Boss Mode calibration"** → answer 6 questions → 
 | `scripts/calibrate.py` | Calibration tool — CLI or conversational |
 | `scripts/generate_prompt.py` | Profile → system prompt generator |
 | `scripts/update_feedback.py` | Feedback loop — learns from corrections |
-| `references/profile_schema.md` | 6-parameter data model |
+| `references/profile_schema.md` | 8-parameter data model |
 | `references/scenarios.md` | Boss command pattern library |
-| `test/test_boss_mode.py` | 22 unit tests ✅ |
+| `test/test_boss_mode.py` | 152 unit tests ✅ |
 
 ---
 
@@ -268,7 +268,7 @@ Then tell your AI: **"Start Boss Mode calibration"** → answer 6 questions → 
 ```bash
 cd scripts/..
 python3 -m pytest test/test_boss_mode.py -v
-# 22/22 passed ✅
+# 152/152 passed ✅
 ```
 
 ---
