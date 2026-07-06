@@ -201,7 +201,7 @@ MIT — 自由使用、修改、分发。
 ---
 
 <p align="center">
-  <strong>👔 Boss Mode v1.1.2</strong><br/>
+  <strong>👔 Boss Mode v1.0.0</strong><br/>
   <sub>Made by <a href="https://github.com/lenkacos-dot">@lenkacos-dot</a></sub>
 </p>
 
