@@ -1,7 +1,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT">
   <img src="https://img.shields.io/badge/python-3.8%2B-brightgreen" alt="Python 3.8+">
-  <img src="https://img.shields.io/badge/tests-22%2F22-passing-brightgreen" alt="22/22 tests passing">
+  <img src="https://img.shields.io/badge/tests-152%2F152-passing-brightgreen" alt="152/152 tests passing">
   <img src="https://img.shields.io/badge/dependencies-zero-orange" alt="Zero dependencies">
   <img src="https://img.shields.io/badge/platform-Hermes%20%7C%20Claude%20%7C%20ChatGPT%20%7C%20OpenCode-lightgrey" alt="Cross-platform">
   <img src="https://img.shields.io/github/stars/lenkacos-dot/boss-mode?style=social" alt="Stars">

@@ -111,10 +111,14 @@ def build_profile(answers):
     for answer in answers:
         if not answer:
             continue
-        scenario_id = answer["scenario_id"]
-        selected = answer["selected"]
-        scenario = next(s for s in SCENARIOS if s["id"] == scenario_id)
-        option = next(o for o in scenario["options"] if o["key"] == selected)
+        scenario_id = answer.get("scenario_id", "")
+        selected = answer.get("selected", "")
+        scenario = next((s for s in SCENARIOS if s["id"] == scenario_id), None)
+        if not scenario:
+            continue
+        option = next((o for o in scenario["options"] if o["key"] == selected), None)
+        if not option:
+            continue
 
         for key, value in option["score"].items():
             if key in params:

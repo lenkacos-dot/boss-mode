@@ -1,6 +1,6 @@
 {
   "name": "boss-mode",
-  "version": "1.1.0",
+  "version": "1.1.2",
   "display_name": "👔 Boss Mode — 老板指令模式",
   "description": "让 AI 理解「老板式」指令：简短、不完整、靠上下文推断。三阶段流程：校准(calibrate) → Prompt注入(generate_prompt) → 反馈循环(update_feedback)。越用越准。",
   "author": "lenkacos-dot",

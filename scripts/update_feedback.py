@@ -44,8 +44,8 @@ MAX_CORRECTIONS = 50
 # ── 纠正识别规则 ──────────────────────────────────────────
 
 # 用户明确否定的开头词——视为纠正
-CORRECTION_PREFIXES = ["不是", "不对", "错了", "不对", "错了", "no", "not", "wrong", "nope"]
-# 用户确认推断的开头词——视为正面反馈
+CORRECTION_PREFIXES = ["不是", "不对", "错了", "no", "not", "wrong", "nope"]
+# 纠正前缀（满足其一即视为纠正，不区分大小写）
 CONFIRMATION_PREFIXES = ["对", "好", "好的", "yes", "right", "correct", "exactly", "yeah"]
 # 新指令的开头词——既不是纠正也不是确认
 NEW_COMMAND_PREFIXES = ["还有", "另外", "接着", "然后", "下一步", "again", "next", "also"]
@@ -135,7 +135,7 @@ _STACK_TRACE_PATTERNS = [
     r"File\s+\".*\",\s+line\s+\d+",   # Python: File "x.py", line 42
     r"\s+->\d+#",                     # Elixir/Erlang stack traces
 ]
-_JSON_LIKE_START = ("{", "[", "[")
+_JSON_LIKE_START = ("{", "[", "(")
 _STRUCTURED_PATTERNS = [
     r"\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}",  # ISO datetime
     r"^\s*[\w.-]+\s*=",                     # key=value
@@ -145,6 +145,8 @@ _STRUCTURED_PATTERNS = [
 
 def _looks_like_log_or_error(text: str) -> bool:
     """判断文本看起来像日志/报错/结构化数据（vs 普通多行指令）。"""
+    if not text:
+        return False
     # 空行分割，检查每一段的特征
     lines = [l for l in text.split("\n") if l.strip()]
     if len(lines) < 2:
@@ -179,6 +181,9 @@ def _looks_like_log_or_error(text: str) -> bool:
     if len(lines) >= 3:
         lengths = [len(l) for l in lines]
         avg = sum(lengths) / len(lengths)
+        # 短行（均值 < 15 字符）的指令式中文文本不应触发
+        if avg < 15:
+            return False
         variance = sum((l - avg) ** 2 for l in lengths) / len(lengths)
         if variance < 100:  # 行间长度变化小 → 日志表格
             return True
@@ -210,7 +215,7 @@ def detect_correction_type(input_text, correction=""):
 
     # paste 检测：多层 heuristics
     stripped = text.strip()
-    if stripped.startswith(("{", "[")):
+    if stripped.startswith(("{", "[", "(")):
         return "paste_wrong"
     if "\n" in text and _looks_like_log_or_error(text):
         return "paste_wrong"
