@@ -80,8 +80,8 @@ description: >
 # 从 Hermes skill 目录安装
 cp -r boss-mode/ ~/.hermes/skills/boss-mode/
 
-# 或者从远程仓库克隆（待发布后）
-# git clone https://github.com/your-username/boss-mode ~/.hermes/skills/boss-mode
+# 或者从远程仓库克隆
+git clone https://github.com/lenkacos-dot/boss-mode ~/.hermes/skills/boss-mode
 ```
 
 ### 方式 B：手动集成
