@@ -1,7 +1,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT">
   <img src="https://img.shields.io/badge/python-3.8%2B-brightgreen" alt="Python 3.8+">
-  <img src="https://img.shields.io/badge/tests-15%2F15-passing-brightgreen" alt="15/15 tests passing">
+  <img src="https://img.shields.io/badge/tests-22%2F22-passing-brightgreen" alt="22/22 tests passing">
   <img src="https://img.shields.io/badge/dependencies-zero-orange" alt="Zero dependencies">
   <img src="https://img.shields.io/badge/platform-Hermes%20%7C%20Claude%20%7C%20ChatGPT%20%7C%20OpenCode-lightgrey" alt="Cross-platform">
   <img src="https://img.shields.io/github/stars/lenkacos-dot/boss-mode?style=social" alt="Stars">
@@ -93,7 +93,7 @@ AI 会问你 6 道场景题 → 答完就生效了。
 
 ### 1️⃣ 校准 — 了解你的风格
 
-回答 6 道场景题，AI 根据你的选择计算 **8 个参数 + 1 个风格标签**。
+回答 6 道场景题，AI 根据你的选择计算 **6 个参数 + 1 个风格标签**。
 
 问什么？比如：
 
@@ -133,6 +133,7 @@ boss-mode/
 ├── SKILL.md                  ← 完整文档（必读！）
 ├── README.md                 ← 本文件
 ├── scripts/
+│   ├── boss_common.py        ← 共享核心模块
 │   ├── calibrate.py          ← 校准工具
 │   ├── generate_prompt.py    ← Prompt 生成器
 │   └── update_feedback.py    ← 反馈更新器
@@ -140,7 +141,7 @@ boss-mode/
 │   ├── profile_schema.md     ← 数据模型文档
 │   └── scenarios.md          ← 指令模式库
 ├── test/
-│   └── test_boss_mode.py     ← 15 个单元测试 ✅
+│   └── test_boss_mode.py     ← 22 个单元测试 ✅
 └── profiles/                 ← 用户画像（运行时生成）
     └── default.json
 ```
@@ -164,7 +165,7 @@ boss-mode/
 cd scripts/..
 python3 -m pytest test/test_boss_mode.py -v
 
-# > 15/15 passed ✅
+# > 22/22 passed ✅
 ```
 
 ---
@@ -174,7 +175,7 @@ python3 -m pytest test/test_boss_mode.py -v
 | 文档 | 内容 |
 |------|------|
 | `SKILL.md` | 完整技能文档（安装/使用/FAQ） |
-| `references/profile_schema.md` | 8 个参数的完整解释 |
+| `references/profile_schema.md` | 6 个参数的完整解释 |
 | `references/scenarios.md` | 4 大类老板指令模式 |
 | `scripts/calibrate.py --help` | CLI 校准模式 |
 
@@ -200,7 +201,7 @@ MIT — 自由使用、修改、分发。
 ---
 
 <p align="center">
-  <strong>👔 Boss Mode v1.0.0</strong><br/>
+  <strong>👔 Boss Mode v1.1.0</strong><br/>
   <sub>Made by <a href="https://github.com/lenkacos-dot">@lenkacos-dot</a></sub>
 </p>
 
@@ -242,7 +243,7 @@ Then tell your AI: **"Start Boss Mode calibration"** → answer 6 questions → 
 
 ## 🏗 Architecture (3-layer)
 
-1. **Calibration (once):** Answer 6 scenario questions → AI computes 8 parameters + 1 style label.
+1. **Calibration (once):** Answer 6 scenario questions → AI computes 6 parameters + 1 style label.
 2. **Prompt Injection (every session):** AI reads your profile → generates a customized system prompt.
 3. **Feedback Loop (continuous):** You correct → AI logs → parameters ±0.05 → next time it's right.
 
@@ -256,9 +257,9 @@ Then tell your AI: **"Start Boss Mode calibration"** → answer 6 questions → 
 | `scripts/calibrate.py` | Calibration tool — CLI or conversational |
 | `scripts/generate_prompt.py` | Profile → system prompt generator |
 | `scripts/update_feedback.py` | Feedback loop — learns from corrections |
-| `references/profile_schema.md` | 8-parameter data model |
+| `references/profile_schema.md` | 6-parameter data model |
 | `references/scenarios.md` | Boss command pattern library |
-| `test/test_boss_mode.py` | 15 unit tests ✅ |
+| `test/test_boss_mode.py` | 22 unit tests ✅ |
 
 ---
 
@@ -267,7 +268,7 @@ Then tell your AI: **"Start Boss Mode calibration"** → answer 6 questions → 
 ```bash
 cd scripts/..
 python3 -m pytest test/test_boss_mode.py -v
-# 15/15 passed ✅
+# 22/22 passed ✅
 ```
 
 ---

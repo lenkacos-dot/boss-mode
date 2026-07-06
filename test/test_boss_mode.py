@@ -14,9 +14,10 @@ import unittest
 # Add parent to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
 
-from calibrate import build_profile, SCENARIOS
+from calibrate import build_profile, SCENARIOS, infer_style_label
 from generate_prompt import generate_prompt
-from update_feedback import learn_pattern, adjust_parameters
+from update_feedback import learn_pattern, adjust_parameters, detect_correction_type
+from boss_common import infer_style_label as common_infer_style_label, ADJUST_STEP
 
 
 class TestCalibration(unittest.TestCase):
@@ -81,6 +82,20 @@ class TestCalibration(unittest.TestCase):
         self.assertIn(params["multi_intent_handling"], ["parallel", "sequential", "ask"])
         self.assertIn(params["paste_behavior"], ["auto_analyze", "ask_intent"])
 
+    def test_calibration_values_match_docs(self):
+        """全选 a 的产出应与文档示例一致（直接取值，不再与默认值平均）。"""
+        answers = [
+            {"scenario_id": s["id"], "selected": "a"}
+            for s in SCENARIOS
+        ]
+        profile = build_profile(answers)
+        params = profile["parameters"]
+        self.assertEqual(params["pronoun_inference"], 0.9)
+        self.assertEqual(params["bare_command_tolerance"], 0.85)
+        self.assertEqual(params["multi_intent_handling"], "parallel")
+        self.assertEqual(params["paste_behavior"], "auto_analyze")
+        self.assertEqual(params["context_depth"], 10)
+
 
 class TestPromptGeneration(unittest.TestCase):
 
@@ -119,6 +134,34 @@ class TestPromptGeneration(unittest.TestCase):
         prompt = generate_prompt(self.efficiency_profile)
         depth = str(self.efficiency_profile["parameters"]["context_depth"])
         self.assertIn(f"{depth} 轮", prompt)
+
+    def test_prompt_english_output(self):
+        """英文模式应产出完整英文 prompt。"""
+        prompt = generate_prompt(self.efficiency_profile, lang="en")
+        self.assertIn("Boss Mode", prompt)
+        self.assertIn("Core Principles", prompt)
+        self.assertIn("Behavior Guide", prompt)
+        self.assertIn("Pronoun Handling", prompt)
+        self.assertIn("Bare Command Handling", prompt)
+        self.assertIn("Correction Style", prompt)
+        self.assertIn("Multi-Intent", prompt)
+        self.assertIn("Paste Behavior", prompt)
+        self.assertIn("Report Format", prompt)
+        self.assertIn("Feedback Loop", prompt)
+        self.assertIn("Efficiency Boss", prompt)
+        self.assertIn("Act first, correct later", prompt)
+
+    def test_prompt_english_cautious_style(self):
+        """英文 cautious profile 应包含对应英文描述。"""
+        prompt = generate_prompt(self.precise_profile, lang="en")
+        self.assertIn("Precise Boss", prompt)
+        self.assertIn("Confirm before executing", prompt)
+
+    def test_invalid_lang_falls_back_to_cn(self):
+        """不支持的语言代码默认回退中文。"""
+        prompt = generate_prompt(self.efficiency_profile, lang="jp")
+        self.assertIn("核心原则", prompt)
+        self.assertNotIn("Core Principles", prompt)
 
 
 class TestFeedbackLoop(unittest.TestCase):
@@ -178,6 +221,57 @@ class TestFeedbackLoop(unittest.TestCase):
         })
 
         self.assertEqual(len(profile["corrections"]), 2)
+
+    def test_adjust_step_is_005(self):
+        """反馈微调步长应为 0.05（与文档承诺一致，历史 bug 为 0.1）。"""
+        self.assertEqual(ADJUST_STEP, 0.05)
+        profile = build_profile([
+            {"scenario_id": s["id"], "selected": "a"} for s in SCENARIOS
+        ])
+        before = profile["parameters"]["pronoun_inference"]
+        profile = adjust_parameters(profile, "pronoun_wrong")
+        after = profile["parameters"]["pronoun_inference"]
+        self.assertAlmostEqual(before - after, 0.05, places=4)
+
+    def test_positive_feedback_raises_params(self):
+        """正面确认应回升参数（双向反馈循环，历史版本只降不升）。"""
+        profile = build_profile([
+            {"scenario_id": s["id"], "selected": "a"} for s in SCENARIOS
+        ])
+        before = profile["parameters"]["pronoun_inference"]
+        profile = adjust_parameters(profile, "pronoun_wrong", direction="up")
+        after = profile["parameters"]["pronoun_inference"]
+        self.assertGreater(after, before)
+        self.assertAlmostEqual(after - before, 0.05, places=4)
+
+    def test_detect_correction_type_multi(self):
+        """含「顺序/优先级」的纠正应识别为 multi_wrong（历史版本永不触发）。"""
+        self.assertEqual(
+            detect_correction_type("查一下然后把日志下了", "顺序反了，先下日志"),
+            "multi_wrong"
+        )
+
+    def test_detect_correction_type_paste(self):
+        """粘贴结构化数据应识别为 paste_wrong（历史版本永不触发）。"""
+        self.assertEqual(detect_correction_type('{"a": 1}', ""), "paste_wrong")
+        self.assertEqual(detect_correction_type("ERROR: NullPointer\nat line 42", ""), "paste_wrong")
+
+    def test_detect_correction_type_pronoun_and_bare(self):
+        """代词与裸命令识别。"""
+        self.assertEqual(detect_correction_type("修好它", "不是 main.py"), "pronoun_wrong")
+        self.assertEqual(detect_correction_type("优化", "不是后端，是前端"), "bare_wrong")
+
+    def test_shared_infer_label_consistency(self):
+        """calibrate 与 boss_common 的 infer_style_label 必须一致（同一来源）。"""
+        for params in [
+            {"pronoun_inference": 0.9, "bare_command_tolerance": 0.85,
+             "correction_style": "act_first", "multi_intent_handling": "parallel",
+             "paste_behavior": "auto_analyze"},
+            {"pronoun_inference": 0.3, "bare_command_tolerance": 0.3,
+             "correction_style": "ask_first", "multi_intent_handling": "ask",
+             "paste_behavior": "ask_intent"},
+        ]:
+            self.assertEqual(infer_style_label(params), common_infer_style_label(params))
 
 
 class TestEndToEnd(unittest.TestCase):

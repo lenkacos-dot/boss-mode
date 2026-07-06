@@ -87,12 +87,12 @@
     "profile_id": "alan-boss",
     "style_label": "efficiency_boss",
     "parameters": {
-      "pronoun_inference": 0.85,
-      "bare_command_tolerance": 0.75,
+      "pronoun_inference": 0.9,
+      "bare_command_tolerance": 0.85,
       "correction_style": "act_first",
-      "multi_intent_handling": "sequential",
+      "multi_intent_handling": "parallel",
       "paste_behavior": "auto_analyze",
-      "context_depth": 5
+      "context_depth": 10
     },
     "corrections": [],
     "frequent_patterns": {

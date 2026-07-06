@@ -1,10 +1,14 @@
 ---
 name: boss-mode
-version: 1.0.0
+version: 1.1.0
 description: >
   👔 老板模式 — 让 AI 学会理解「老板、领导、甲方」的指令风格。
   用户说「修好它」、「优化」、「查一下然后把日志下载了」时，AI 不再追问"你说的它是什么"，
   而是大胆推断、果断执行。校准 → Prompt 注入 → 反馈循环，三层结构。
+capabilities:
+  - 用户表达风格校准（6 道场景题 → 6 参数 + 风格标签）
+  - System Prompt 动态注入（按 profile 生成行为指令）
+  - 反馈循环（纠正 / 确认 → 参数 ±0.05 双向微调）
 ---
 
 # 👔 Boss Mode — 老板指令模式
@@ -136,12 +140,12 @@ python3 ~/.hermes/skills/boss-mode/scripts/calibrate.py --cli
 {
   "style_label": "efficiency_boss",
   "parameters": {
-    "pronoun_inference": 0.85,
-    "bare_command_tolerance": 0.75,
+    "pronoun_inference": 0.9,
+    "bare_command_tolerance": 0.85,
     "correction_style": "act_first",
-    "multi_intent_handling": "sequential",
+    "multi_intent_handling": "parallel",
     "paste_behavior": "auto_analyze",
-    "context_depth": 5
+    "context_depth": 10
   }
 }
 ```
@@ -181,11 +185,11 @@ python3 ~/.hermes/skills/boss-mode/scripts/generate_prompt.py ~/.hermes/skills/b
 4. 用户如果纠正你，记录到 feedback — 这是你学习用户表达习惯的方式
 
 ### 具体行为指南
-**代词处理**（推断力度：85%）：
+**代词处理**（推断力度：90%）：
 - 用户说"它" = 最近讨论的那个东西
 - 用户说"那个API" = 之前提到过的那个 API
 
-**裸命令处理**（容忍度：75%）：
+**裸命令处理**（容忍度：85%）：
 - "优化" → 做最常见的优化
 - "改一下" → 改最近讨论的东西
 - "怎么样了" → 汇报当前进度
@@ -364,6 +368,7 @@ Boss Mode 是 fuzzy-input v1/v2 的完全替代方案。
 boss-mode/
 ├── SKILL.md                       ← 本文档（核心）
 ├── scripts/
+│   ├── boss_common.py             ← 共享核心模块（参数/风格推断）
 │   ├── calibrate.py               ← 校准工具
 │   ├── generate_prompt.py         ← Prompt 生成器
 │   └── update_feedback.py         ← 反馈更新工具

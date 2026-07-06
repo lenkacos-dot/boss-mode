@@ -1,0 +1,44 @@
+{
+  "name": "boss-mode",
+  "version": "1.1.0",
+  "display_name": "👔 Boss Mode — 老板指令模式",
+  "description": "让 AI 理解「老板式」指令：简短、不完整、靠上下文推断。三阶段流程：校准(calibrate) → Prompt注入(generate_prompt) → 反馈循环(update_feedback)。越用越准。",
+  "author": "lenkacos-dot",
+  "homepage": "https://github.com/lenkacos-dot/boss-mode",
+  "triggers": {
+    "on_first_contact": {
+      "description": "首次对话，检测到无 profile 时引导用户完成校准",
+      "action": "检测 ~/.hermes/skills/boss-mode/profiles/default.json 是否存在，不存在则提示用户运行 calibrate.py 或直接在线作答"
+    },
+    "before_each_turn": {
+      "description": "每轮对话前读取 profile，将 generate_prompt 输出附加到系统 prompt",
+      "action": "读取 profile → 调用 generate_prompt.py 生成注入段 → 合并到当前 system prompt 末尾",
+      "note": "profile 路径：~/.hermes/skills/boss-mode/profiles/default.json"
+    },
+    "on_correction": {
+      "description": "用户纠正 AI 推断时调用 update_feedback.py 更新参数",
+      "action": "检测到纠正信号（否定开头/明确指正）→ 构建 JSON → 管道传入 update_feedback.py --quiet",
+      "example": "echo '{\"input\":\"修好它\",\"ai_inference\":\"modified main.py\",\"correction\":\"not main.py, utils.py\"}' | python3 update_feedback.py profiles/default.json --quiet"
+    },
+    "on_confirmation": {
+      "description": "用户确认推断正确时调用 update_feedback.py --positive 回升参数",
+      "action": "检测到确认信号（肯定开头/明确确认）→ 构建 JSON → update_feedback.py --quiet 带 positive:true"
+    }
+  },
+  "call_chain": {
+    "step_1": "calibrate.py — 首次交互，用户完成 8 道校准题，生成 profile",
+    "step_2": "generate_prompt.py — 每轮对话读取 profile，生成注入段附加到 system prompt",
+    "step_3": "update_feedback.py — 用户每次纠正/确认时更新参数，越用越准"
+  },
+  "dependencies": {
+    "python_version": ">=3.8",
+    "external_packages": [],
+    "required_files": ["scripts/calibrate.py", "scripts/generate_prompt.py", "scripts/update_feedback.py", "scripts/boss_common.py"]
+  },
+  "files": {
+    "profiles/": "用户画像存放目录，默认路径 ~/.hermes/skills/boss-mode/profiles/default.json",
+    "scripts/": "核心脚本：calibrate.py / generate_prompt.py / update_feedback.py / boss_common.py",
+    "test/": "测试套件：test_boss_mode.py（25 个测试，覆盖校准/prompt/反馈/多语言）"
+  },
+  "tags": ["boss-mode", "instruction-mode", "feedback-loop", "calibration", "productivity"]
+}
