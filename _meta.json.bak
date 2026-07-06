@@ -38,7 +38,7 @@
   "files": {
     "profiles/": "用户画像存放目录，默认路径 ~/.hermes/skills/boss-mode/profiles/default.json",
     "scripts/": "核心脚本：calibrate.py / generate_prompt.py / update_feedback.py / boss_common.py",
-    "test/": "测试套件：test_boss_mode.py（152 个测试，覆盖校准/prompt/反馈/多语言/边界/14 个测试类）"
+    "test/": "测试套件：test_boss_mode.py（25 个测试，覆盖校准/prompt/反馈/多语言）"
   },
   "tags": ["boss-mode", "instruction-mode", "feedback-loop", "calibration", "productivity"]
 }
